@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <title>문서객체</title>
+        <style>
+            p { color: red; }
+        </style>
+    </head>
+    <body>
+        <h1>문서객체</h1>
+        <div id="div1"></div>
+        <div class="div2"></div>
+        <div name="div3"></div>
+        <div></div>
+        <p></p>
+
+        <script>
+            let div1 = document.getElementById('div1');
+            let div2 = document.getElementsByClassName('div2');
+            let div3 = document.getElementsByName('div3');
+
+            let p1 = document.querySelector('p');
+            let p2 = document.querySelectorAll('p'); // 결과는 복수
+
+            let div1b = document.querySelector('#div1'); // sunmin_id 선택자(#)
+            let div2b = document.querySelector('.div2'); // sunmin_class 선택자(.)
+
+            div1.innerHTML = "Hello, World!";
+            div2[0].innerHTML = "Hello, World 2!"; // sunmin_getElement's'By로 되어있기 때문에 배열로 받아야함
+            div3[0].innerHTML = "Hello, World 3!";
+
+            p1.innerHTML = "Hello, World 4!";
+            p2[0].innerHTML = "Hello, World 5!";
+
+            div1b.innerHTML = "Hello, World 6!";
+            div2b.innerHTML = "Hello, World 7!";
+
+            div1.style.color = 'blue';
+            div2[0].style.fontWeight = 'bold';
+            p1.style.background = 'yellow';
+        </script>
+
+        <h2>title 태그에 현재 날짜/시간 출력하기</h2>
+        <script>
+            // 현재 날짜/시간 => 2021-05-14 03:14:15
+            function today3() {
+                let day = new Date();
+                let m = (day.getMonth()+1);
+                let d = day.getDate();
+                let h = day.getHours();
+                let M = day.getMinutes();
+                let s = day.getSeconds();
+
+                let result = day.getFullYear() + '-' + df(m) + '-' + df(d) + ' ' + df(h) + ':' + df(M) + ':' + df(s);
+
+                // let title = document.getElementsByTagName('title')[0];
+                let title = document.querySelector('title');
+                title.innerHTML = result;
+            }
+
+            function df(val) {
+                if (val < 10) val = '0' + val;
+                return val;
+            }
+
+            setInterval(today3, 1000);
+        </script>
+
+        <h2>dom으로 이미지 조작하기</h2>
+        <div><button type="button" id="showbtn">이미지 나와랏!</button>
+             <button type="button" id="hidebtn">이미지 사라져랏!</button></div>
+        <div id="imgdiv"></div>
+
+        <script>
+            let showbtn = document.querySelector('#showbtn');
+            let hidebtn = document.querySelector('#hidebtn');
+            let imgdiv = document.querySelector('#imgdiv');
+
+            showbtn.addEventListener('click', showimg);
+            hidebtn.addEventListener('click', hideimg);
+
+            function showimg() {
+                let img = document.createElement('img'); // img
+                let src = document.createAttribute('src'); // src
+                let images = ['curly.png', 'Isabelle.png', 'Marshal.png'];
+
+                // src.value = '/img/Isabelle.png';
+
+                // Math.random을 이용해서 3가지 이미지 중 하나를 선택
+                let idx = parseInt(Math.random() * (3-0));
+                src.value = '/img/' + images[idx];
+
+                img.setAttributeNode(src); // img에 src 추가
+                imgdiv.appendChild(img); // div에 img 추가
+            }
+
+            function hideimg() {
+                // let img = imgdiv.firstChild;
+                // 부모요소 밑 첫번째 자식요소를 선택함
+                let img = imgdiv.lastChild;
+                // 부모요소 밑 마지막 자식요소를 선택함
+
+                imgdiv.removeChild(img);
+                // 부모요소에서 선택한 자식요소를 제거
+            }
+         </script>
+
+        <h2>주소검색</h2>
+        <div>
+            <select id="sido">
+                <option>-시/도-</option>
+                <option>서울특별시</option>
+                <option>인천광역시</option>
+                <option>경기도</option>
+                <option>부산광역시</option>
+            </select>
+
+            <select id="gugun">
+                <option>-시/군/구-</option>
+            </select>
+
+            <select id="dong">
+                <option>-읍/면/동-</option>
+            </select>
+        </div>
+        <p id="addr"></p>
+
+        <script>
+            // 전국 시도중 하나를 선택하면 선택한 시도에 대한 시군구가 다음 select에 목록으로 출력되고
+            // 시군구 중 하나를 선택하면 선택한 시군구에 대한 읍면동이 다음 select에 목록으로 출력되도록 함
+
+            // 포인트1 : 이벤트발생시 option 태그가 동적으로 생성
+            // 포인트2 : select에서 발생가능한 이벤트는 change임
+            // 포인트3 : select에서 선택한 항목의 정보는 selectedIndex속성을 이용
+            // 포인트4 : option태그에 텍스트를 추가하려면 createTextNode를 이용
+
+            let sd = ['','서울특별시','경기도','인천광역시','부산광역시'];
+            let sgg = [ ['- 시/군/구 -'],
+                        ['- 시/군/구 -','강남구','서초구','송파구','종로구'],
+                        ['- 시/군/구 -','광명시','구리시','성남시','수원시','고양시'],
+                        ['- 시/군/구 -','연수구','남동구','서구'],
+                        ['- 시/군/구 -','진구','동래구','해운대구','기장군'] ];
+
+            // 변수 선언
+            let sido = document.querySelector('#sido');
+            let gugun = document.querySelector('#gugun');
+            let dong = document.querySelector('#dong');
+
+            // 첫번째 select에 change 이벤트 등록
+            sido.addEventListener('change', makegu);
+
+            function makegu() {
+                // alert(sido.selectedIndex);
+                // for of를 이용해서 배열요소 출력
+                // createTextNode를 이용해서 텍스트 출력
+                let idx
+                sido.selectedIndex()
+                document.querySelector('option').createTextNode(sgg);
+            }
+
+        </script>
+
+    </body>
+</html>
+<!--
+DOM document object model
+html/xml 문서의 각 요소에 접근하기 위해 만들어둔 객체들의 모음
+
+DOM을 이용해서 문서 내 모든 요소를 접근하고 조작할 수 있음
+즉, 기존 문서에 새로운 요소를 추가/수정/삭제할 수 있고
+기존 요소를 수정/삭제할 수 있으며 스타일 역시 추가/수정/삭제할 수 있음
+
+브라우저로 웹문서를 읽으면 분석parsing과정을 거쳐 자동으로 생성됨
+
+DOM 중에서 document 개체는 문서 자체를 의미
+즉, 웹문서 내 특정 요소에 접근하려면 반드시 document 개체를 통해야만 함
+
+한편, document객체를 통해 문서의 특정요소를 선택하려면
+getElementById, getQuerySelector,
+getElementsByTagName, getElementsByClassName,
+getElementsByName, querySelectorAll 등의 함수를 이용해야 함
+
+DOM을 이용해서 선택한 html 요소의 내용이나 속성을 변경하려면
+'요소명.innerHTML' 또는 '요소명.속성명'을 이용하면 됨
+또한, 선택한 html 요소의 스타일을 변경하려면
+'요소명.style.스타일속성'을 사용하면 됨
+-->
+<!--
+DOM을 이용해서 문서에 새로운 요소나 속성을 추가하려면
+createElement, createAttribute, createTextNode,
+appendChild, removeChild, setAttribute등의 함수 이용
+-->
